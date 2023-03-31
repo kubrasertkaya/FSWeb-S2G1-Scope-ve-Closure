@@ -30,10 +30,21 @@ console.log('örnek görev:', ilkiniDon(['as','sa'],function(metin){return metin
   Aşağıdaki skor1 ve skor2 kodlarını inceleyiniz ve aşağıdaki soruları altına not alarak cevaplayın
   
   1. skor1 ve skor2 arasındaki fark nedir?
-  
+  skor1 bir closure  skor2 normal bir fonksiyon 
+
+
   2. Hangisi bir closure kullanmaktadır? Nasıl tarif edebilirsin? (yarınki derste öğreneceksin :) )
-  
+  skor1 bir closure kullanmaktta.skorArtirici() fonksiyonu, kapsayıcı bir fonksiyon olarak skor değişkenini içerir ve içeride bir başka fonksiyon 
+  olan skorGuncelle() fonksiyonunu döndürür. Bu iç fonksiyon, skor değişkenine erişebilir ve değerini her çağrıda 1 arttırır.
+
+
   3. Hangi durumda skor1 tercih edilebilir? Hangi durumda skor2 daha mantıklıdır?
+  skor değişkenine sadece skorArtirici() fonksiyonu erişebilirken, dışarıdan skor1() fonksiyonu ile değeri artırılabilir ve güncellenebilir.Bu şekilde değişken, 
+  fonksiyonun dışındaki kod tarafından korunarak gizlenebilir ve fonksiyonun içindeki işlemler için kullanılabilir.
+  skor2 ise closure kullanmaz.Bu yüzden;
+  skor değişkeni, global bir değişken olarak tanımlanır ve skor2() fonksiyonu, bu değişkene erişebilir. Fonksiyon her çağrıda, skor değişkenini arttırarak döndürür.
+  Ancak bu yöntemde skor değişkeni global bir değişken olduğu için, diğer fonksiyonlar veya kod parçaları tarafından değiştirilebilir. 
+  Bu nedenle skor2() fonksiyonunun çağrılması sonucu elde edilen skor, her zaman güncel olmayabilir ve beklenmeyen sonuçlara neden olabilir.
 */
 
 // skor1 kodları
@@ -64,12 +75,12 @@ Aşağıdaki takimSkoru() fonksiyonununda aşağıdakileri yapınız:
 Not: Bu fonskiyon, aşağıdaki diğer görevler için de bir callback fonksiyonu olarak da kullanılacak
 */
 
-function takimSkoru(/*Kodunuzu buraya yazınız*/){
-    /*Kodunuzu buraya yazınız*/
+function takimSkoru(){
+   return Math.floor(Math.random()*25-10+1)+10;
 }
-
-
-
+console.log(takimSkoru());
+console.log(takimSkoru());
+console.log(takimSkoru());
 
 /* Görev 3: macSonucu() 
 Aşağıdaki macSonucu() fonksiyonununda aşağıdakileri yapınız:
@@ -85,14 +96,35 @@ Aşağıdaki macSonucu() fonksiyonununda aşağıdakileri yapınız:
   "KonukTakim": 80
 }
 */ 
-
-function macSonucu(/*Kodunuzu buraya yazınız*/){
-  /*Kodunuzu buraya yazınız*/
+/*
+function macSonucu(callback,ceyreksayi){
+  const sonuc={
+    EvSahibi:0,
+    KonukTakim:0,
+  };
+  for(let i=1;i<=ceyreksayi; i++){
+    for(let takim in sonuc){
+      sonuc[takim]+=callback();
+      console.log(sonuc);
+    }
+  }
+  return sonuc;
 }
+console.log(macSonucu(takimSkoru,4));
+*/
+function macSonucu(callback,mactaOynananCeyrekSayisi){
+  const skorNesne={
+    EvSahibi:0,
+    KonukTakim:0,
+};
+ for(let i=0; i<=mactaOynananCeyrekSayisi; i++){
+  skorNesne.EvSahibi=skorNesne.EvSahibi+callback();
+  skorNesne.KonukTakim=skorNesne.KonukTakim+callback();
+ }
+ return skorNesne;
 
-
-
-
+}
+console.log(macSonucu(takimSkoru,4));
 
 
 /* Zorlayıcı Görev 4: periyotSkoru()
@@ -109,10 +141,17 @@ Aşağıdaki periyotSkoru() fonksiyonununda aşağıdakileri yapınız:
   */
 
 
-function periyotSkoru(/*Kodunuzu buraya yazınız*/) {
-  /*Kodunuzu buraya yazınız*/
-
-}
+function periyotSkoru(callback) {
+  const skor={
+    EvSahibi:0,
+    KonukTakim:0,
+};
+   for(let taraf in skor){
+    skor[taraf]=callback;
+   }
+   return skor;
+  }
+console.log(periyotSkoru(takimSkoru()));
 
 
 /* Zorlayıcı Görev 5: skorTabelasi() 
@@ -146,10 +185,22 @@ MAÇ UZAR ise skorTabelasi(periyotSkoru,takimSkoru,4)
 ] */
 // NOTE: Bununla ilgili bir test yoktur. Eğer logladığınız sonuçlar yukarıdakine benziyor ise tmamlandı sayabilirsiniz.
 
-function skorTabelasi(/*Kodunuzu buraya yazınız*/) {
-  /*Kodunuzu buraya yazınız*/
+function skorTabelasi(periodScoreCb,teamScoreCb,quarter) {
+  const scoreArray=[];
+  let macToplam={
+    EvSahibi:0,
+    KonukTakim:0,
+  };
+  //her periot için tur
+  for(let i=1; i<=quarter; i++){
+    const periodResult=periodScoreCb(teamScoreCb);//Bu kod, "periodScoreCb" adlı bir fonksiyonu "teamScoreCb" fonksiyonuna bağımlı hale getir
+    //    ve "periodResult" adlı bir değişkene atar.
+    const scoreBacktick=`${i}.Periyot:Ev Sahibi ${periodResult.EvSahibi}-Konuk Takim ${periodResult.KonukTakim}`;
+        scoreArray.push(scoreBacktick);                                     
+  }
+  return scoreArray;
 }
-
+console.log(skorTabelasi(periyotSkoru,takimSkoru,3));
 
 
 
